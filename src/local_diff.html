@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title></title>
+        <script src="./diff.js"></script>
+        <script src="./jsdiff.js"></script>
+    </head>
+    <body>
+        <div id="cli">
+            <textarea id="client" name="" cols="30" rows="10"></textarea>
+        </div>
+
+        <!-- <div id="cli2"> -->
+        <!--   <textarea id="client2" name="" cols="30" rows="10"></textarea> -->
+        <!-- </div> -->
+
+        <div id="sha">
+            <textarea id="shadow" name="" cols="30" rows="10"></textarea>
+        </div>
+
+        <div id="ser">
+            <textarea id="server" name="" cols="30" rows="10"></textarea>
+        </div>
+    </body>
+
+    <script>
+     // https://github.com/kpdecker/jsdiff/blob/master/src/diff/character.js
+	   const characterDiff = new Diff();
+	   function diffChars(oldStr, newStr, options) { return characterDiff.diff(oldStr, newStr, options); }
+     // client <=> shadow diff
+     function diffLocal(source, result) {
+         var source_val = document.getElementById(source).value;
+         var result_val = document.getElementById(result).value;
+         return diffChars(result_val, source_val);
+     }
+     function applyDiff(data) {
+         // var beforeText = document.getElementById(source).value;
+         var result = '';
+         for (var x of data) {
+             if (x.removed == undefined) {
+                 result += x.value;
+             }
+         }
+         return result;
+     }
+     function applyAddDiff(data) {
+         var result = '';
+         for (var x of data) {
+             result += x.value;
+         }
+         return result;
+     }
+     
+     // 화면이 load될때 / interval(1초마다)
+     function patchFromServer() {
+         // server => client
+         var changedData = diffLocal('server', 'shadow');
+         var changed_result = applyDiff(changedData);
+		     sendLocal('shadow', changed_result);
+         // shadow => client
+     }
+     // server -> client
+     //   (function() {
+     //     patchFromServer();
+     //   })();
+     // interval  
+     
+     document.getElementById('cli').addEventListener('keyup', function(){
+         var changedData = diffLocal('client', 'shadow');
+         var changed_result = applyDiff(changedData);
+         console.log(changed_result);
+         var beforeShadowData = document.getElementById('shadow').value;
+         sendLocal('shadow', changed_result);
+         var serverData = document.getElementById('server').value;
+         if (beforeShadowData === serverData) {
+             // 검증후 patch
+             sendLocal('server', changed_result);
+         } else {
+             // add만 적용
+             var changedData = diffLocal('server', 'shadow');
+             var serverData = applyAddDiff(changedData);
+             sendLocal('server', serverData);
+         }
+	   });
+     
+     function sendLocal(divId, data){
+         document.getElementById(divId).value = data;
+     }
+     // server <=> shadow (diff)
+    </script>
+
+</html>

@@ -1,6 +1,7 @@
 const diff_match_patch = require('./diff-match-patch.js')
 const __dev__ = true
 
+
 const DSComponent = ((()=>{
 
     const _shadow = new WeakMap()
@@ -11,7 +12,11 @@ const DSComponent = ((()=>{
         constructor(){
             _edits.set(this, [])
             _content.set(this, null)
-            _showdow.set(this, null)
+            _shadow.set(this, null)
+        }
+
+        get edits() {
+            return _edits.get(this)
         }
 
         diff(oldContent, newContent) {
@@ -71,3 +76,6 @@ const DSTextComponent = ((()=>{
     // DS라이브러리에서 직접 객체를 하나 만들어서 준다.
     return new DSTextComponent()
 })())
+
+module.exports = DSTextComponent
+

@@ -61,3 +61,9 @@
 //
 const DS = require('./ds.js')
 const assert = require('assert')
+
+DS.diff("cat","cats")
+DS.patch("Cat")
+
+assert.deepEqual(DS.patch("Cat"),"Cats") 
+

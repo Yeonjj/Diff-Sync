@@ -1,6 +1,8 @@
-const diff_match_patch = require('./diff-match-patch.js')
-const __dev__ = true
+'use strict'
 
+const diff_match_patch = require('./diff-match-patch.js')
+const { performance } = require('perf_hooks')
+const __dev__ = true
 
 const DSComponent = ((()=>{
 
@@ -47,13 +49,13 @@ const DSTextComponent = ((()=>{
                 const t0 = performance.now()
                 _dmp.get(this).diff_main(oldText, newText)
                 const t1 = performance.now()
-                console.lot(`${t1-t0} ms`)
+                console.log(`${t1-t0} ms`)
             }
 
             const diff = _dmp.get(this).diff_main(oldText, newText)
 
-            if (edit.length > 2) {
-                _dmp.get(this).diff_cleanupSemantic(edit);
+            if (diff.length > 2) {
+                _dmp.get(this).diff_cleanupSemantic(diff);
             }
 
             const edit_list = _dmp.get(this).patch_make(oldText, newText, diff)
@@ -78,4 +80,3 @@ const DSTextComponent = ((()=>{
 })())
 
 module.exports = DSTextComponent
-

@@ -1,14 +1,18 @@
 {
-  "name": "diff-sync-project",
-  "version": "1.0.0",
-  "description": "DS based server client editor",
-  "main": "app.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "jsdiff": "^1.1.1"
-  }
+    "name": "diff-sync-project",
+    "version": "1.0.0",
+    "description": "DS based server client editor",
+    "main": "app.js",
+    "scripts": {
+        "jest": "jest"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "express": "^4.16.4",
+        "vue": "^2.5.17"
+    },
+    "devDependencies": {
+        "jest": "^23.6.0"
+    }
 }

@@ -1,8 +1,6 @@
 'use strict'
 
 const diff_match_patch = require('./diff-match-patch.js')
-const { performance } = require('perf_hooks')
-const __dev__ = true
 
 const DSComponent = ((()=>{
 
@@ -21,6 +19,10 @@ const DSComponent = ((()=>{
             return _edits.get(this)
         }
 
+        sendEdits(){
+
+        }
+
         diff(oldContent, newContent) {
             throw new SyntaxError(`running from DSComponent : diff is not implemented!`)
         }
@@ -35,6 +37,8 @@ const DSComponent = ((()=>{
     return DSComponent
 })())
 
+// This is an user side code.
+// TODO: should make this be coded on user side as an inheritance class of DSComponent
 const DSTextComponent = ((()=>{
     const _dmp = new WeakMap()
 
@@ -45,13 +49,6 @@ const DSTextComponent = ((()=>{
         }
 
         diff(oldText, newText){
-            if(__dev__){
-                const t0 = performance.now()
-                _dmp.get(this).diff_main(oldText, newText)
-                const t1 = performance.now()
-                console.log(`${t1-t0} ms`)
-            }
-
             const diff = _dmp.get(this).diff_main(oldText, newText)
 
             if (diff.length > 2) {

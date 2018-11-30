@@ -1,18 +1,24 @@
 'use strict'
+const __dev__ = true
 
-const DSComponent = ((()=>{
+const DPComponent = (()=>{
 
-    const _shadow = new WeakMap()
-    const _content = new WeakMap()
     const _edits = new WeakMap()
+    const _diff = new WeakMap()
+    const _patch = new WeakMap()
 
-    class DSComponent {
+
+    class DPComponent {
         constructor(diff, patch){
             _edits.set(this, [])
-            _content.set(this, null)
-            _shadow.set(this, null)
-            this._diff = diff
-            this._patch = patch
+
+            if(!_diff)
+                throw new SyntaxError(`diff is not implemented! you should pass it as constructor param`)
+            _diff.set(this, diff)
+
+            if(!_patch)
+                throw new SyntaxError(`patch is not implemented! you should pass it as constructor param`)
+            _patch.set(this, patch)
         }
 
         get edits() {
@@ -20,29 +26,84 @@ const DSComponent = ((()=>{
         }
 
         diff(oldContent, newContent) {
-            if(!this._diff)
-                throw new SyntaxError(`running from DSComponent : diff is not implemented!`)
-            this._diff.call(this, oldContent, newContent)
+            _diff.get(this).call(this, oldContent, newContent)
         }
 
         patch(oldContent) {
-            if(!this._patch)
-                throw new SyntaxError(`running form DSComponent : patch is not implemented`)
-            return this._patch.call(this, oldContent)
+            return _patch.get(this).call(this, oldContent)
         }
     }
 
-    //TDOO: 여기에 DSTextcomponent를 가지고 오면
+    return DPComponent
+})()
 
-    return DSComponent
-})())
+// ajax connection
+const DSPipelineComponent = (()=>{
+    // assume that content is always HETML element
+    const _content = new WeakMap()
+    const _xhr = new WeakMap()
+    class DSPipelineComponent {
+        constructor(content, url){
+            _content.set(this, content)
+            _url.set(this, url)
+            _xhr.set(this, new XMLHttpRequest())
+        }
+        start(){
+            setInterval(this.sendEditsWithVersionNumber(url),1000)
+            return this
+        }
+        sendEditsWithVersionNumber(url, edits){
+            // axjs send date [edits, my_ver, your_ver]
+            throw new SyntaxError(`sendEditswithversionnumber is not implemented!`)
+        }
+    }
+    return DSPipelineComponent
+})()
 
-// instead of inheritance, injecting dependencies into DScomponent would also be ok
+// client ds
+const DSPipelineClient = (()=>{
+    class DSPipelineClient extends DSPipelineComponent{
+        constructor(){
+        }
+        sendEditsWithVersionNumber(url, edits){
+
+        }
+    }
+    return DSPipelineClient
+})()
+
+
+const DSPipelineServer = (()=>{
+    class DSPipelineClient extends DSPipelineComponent{
+        constructor(){
+        }
+        sendEditsWithVersionNumber(url, edits){
+
+        }
+    }
+    return DSPipelineClient
+})()
+
+// pipeline structure, DSObject is  middleware
+const DSObject = (()=>{
+    class DSObject {
+    }
+
+    return DSObject
+})()
+
+if(__dev__){
+    exports.DPComponent = DPComponent
+    exports.DSPipelineComponent = DSPipelineComponent
+}
+exports.DSObject = DSObject
+
+
 // This is an user side code.
-// TODO: should make this be coded on user side as an inheritance class of DSComponent
+// TODO: should make this be coded on user side as an inheritance class of DPComponent
 const diff_match_patch = require('./diff-match-patch.js')
 
-function implementDS(){
+const implementDS = function() {
     const _dmp = new diff_match_patch()
     return {
         diff : function (oldText, newText){
@@ -51,7 +112,6 @@ function implementDS(){
             if (diff.length > 2) {
                 _dmp.diff_cleanupSemantic(diff);
             }
-
 
             const edit_list = _dmp.patch_make(oldText, newText, diff)
             this.edits.push(edit_list)
@@ -70,54 +130,5 @@ function implementDS(){
 }
 
 const implemented = new implementDS()
-exports.textComponent = new DSComponent(implemented.diff, implemented.patch)
-
-
-
-const DSTextComponent = ((()=>{
-    const _dmp = new WeakMap()
-
-    class DSTextComponent extends DSComponent {
-        constructor(){
-            super()
-            _dmp.set(this, new diff_match_patch())
-        }
-
-        diff(oldText, newText){
-            const diff = _dmp.get(this).diff_main(oldText, newText)
-
-            if (diff.length > 2) {
-                _dmp.get(this).diff_cleanupSemantic(diff);
-            }
-
-            const edit_list = _dmp.get(this).patch_make(oldText, newText, diff)
-            super.edits.push(edit_list)
-        }
-
-        patch(oldText){
-            let result = ''
-            for(const edit of super.edits){
-                if (result)
-                    result = _dmp.get(this).patch_apply(edit, result[0])
-                else
-                    result = _dmp.get(this).patch_apply(edit, oldText)
-            }
-            return result[0]
-        }
-    }
-    // DSTextcomponent를 singletone으로 만들기 위해 new로 선언.
-    // DScomponent의 edits를 보호하기 위함.
-    // DS라이브러리에서 직접 객체를 하나 만들어서 준다.
-    return new DSTextComponent()
-})())
-
-//
-const DSConnectionComponent = 0
-
-// pipeline structure, DSObject is  middleware
-const DSObject = 0
-
-//exports.textComponent = DSTextComponent
-exports.DSConnectionComponent = DSConnectionComponent
-exports.DSObject = DSObject
+exports.textComponent = new DPComponent(implemented.diff, implemented.patch)
 

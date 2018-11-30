@@ -12,7 +12,7 @@ describe('ds-algorithm-test ',() => {
     })
 
     it('creates the DS text object', ()=>{
-        expect(Object.keys(DS)).toEqual(['textComponent', 'DSConnectionComponent', 'DSObject'])
+        expect(Object.keys(DS)).toEqual(['DPComponent', 'DSConnectionComponent', 'DSObject', 'textComponent'])
         expect(typeof(DS.textComponent)).toBe("object")
         expect(typeof(diff_match_patch)).toBe("function")
         expect(typeof(dmp)).toBe("object")

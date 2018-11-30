@@ -1,7 +1,5 @@
 'use strict'
 
-const diff_match_patch = require('./diff-match-patch.js')
-
 const DSComponent = ((()=>{
 
     const _shadow = new WeakMap()
@@ -9,26 +7,28 @@ const DSComponent = ((()=>{
     const _edits = new WeakMap()
 
     class DSComponent {
-        constructor(){
+        constructor(diff, patch){
             _edits.set(this, [])
             _content.set(this, null)
             _shadow.set(this, null)
+            this._diff = diff
+            this._patch = patch
         }
 
         get edits() {
             return _edits.get(this)
         }
 
-        sendEdits(){
-
-        }
-
         diff(oldContent, newContent) {
-            throw new SyntaxError(`running from DSComponent : diff is not implemented!`)
+            if(!this._diff)
+                throw new SyntaxError(`running from DSComponent : diff is not implemented!`)
+            this._diff.call(this, oldContent, newContent)
         }
 
-        patch() {
-            throw new SyntaxError(`running form DSComponent : patch is not implemented`)
+        patch(oldContent) {
+            if(!this._patch)
+                throw new SyntaxError(`running form DSComponent : patch is not implemented`)
+            return this._patch.call(this, oldContent)
         }
     }
 
@@ -37,8 +37,43 @@ const DSComponent = ((()=>{
     return DSComponent
 })())
 
+// instead of inheritance, injecting dependencies into DScomponent would also be ok
 // This is an user side code.
 // TODO: should make this be coded on user side as an inheritance class of DSComponent
+const diff_match_patch = require('./diff-match-patch.js')
+
+function implementDS(){
+    const _dmp = new diff_match_patch()
+    return {
+        diff : function (oldText, newText){
+            const diff = _dmp.diff_main(oldText, newText)
+
+            if (diff.length > 2) {
+                _dmp.diff_cleanupSemantic(diff);
+            }
+
+
+            const edit_list = _dmp.patch_make(oldText, newText, diff)
+            this.edits.push(edit_list)
+        },
+        patch : function (oldText){
+            let result = ''
+            for(const edit of this.edits){
+                if (result)
+                    result = _dmp.patch_apply(edit, result[0])
+                else
+                    result = _dmp.patch_apply(edit, oldText)
+            }
+            return result[0]
+        }
+    }
+}
+
+const implemented = new implementDS()
+exports.textComponent = new DSComponent(implemented.diff, implemented.patch)
+
+
+
 const DSTextComponent = ((()=>{
     const _dmp = new WeakMap()
 
@@ -76,4 +111,13 @@ const DSTextComponent = ((()=>{
     return new DSTextComponent()
 })())
 
-module.exports = DSTextComponent
+//
+const DSConnectionComponent = 0
+
+// pipeline structure, DSObject is  middleware
+const DSObject = 0
+
+//exports.textComponent = DSTextComponent
+exports.DSConnectionComponent = DSConnectionComponent
+exports.DSObject = DSObject
+

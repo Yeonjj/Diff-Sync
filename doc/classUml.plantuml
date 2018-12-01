@@ -1,0 +1,46 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+abstract class DSOperation {
++addNewOperationWithType(newOperation, newType)
+{abstract}+diff(oldContent, newContent)
+{abstract}+patch(oldContent, edits)
+}
+
+class DSTextOperation{
++diff(oldContent, newContent)
++patch(oldContent, edits)
+}
+
+
+
+class PiplineManager {
+-pipline
++addNextPipe()
++run()
+}
+
+class DSObject {
+-piplineMng
+-operation
+-shadow
+-edits
+-myVer
+-yourVer
+}
+
+class DSObjectClient {
+
+}
+
+class DSObjectServer {
+
+}
+
+DSObject -> PiplineManager
+DSObject *--> DSOperation 
+DSObjectClient --|> DSObject
+DSObjectServer --|> DSObject
+DSOperation <|..  DSTextOperation
+
+@enduml

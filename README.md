@@ -1,2 +1,1 @@
-# Diff-Sync algorithm
-Differential Synchronisation Algorithm Library
+# Diff-Sync TextEditor

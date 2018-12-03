@@ -2,7 +2,7 @@
 
 ## class oaverview
 
- - 2018.12.3 현제 class 구조
+x - 2018.12.3 현제 class 구조
 
 ![Image of Yaktocat](./DSObject-classes.png)
 

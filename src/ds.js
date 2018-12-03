@@ -1,6 +1,7 @@
 'use strict'
 const __dev__ = true
 
+
 /*
    setOperation() should always have to be called after the available Types are set.
    After DSObject are created, you can add a diff-patch operation for a new type of content
@@ -94,28 +95,19 @@ const DSObject = (()=>{
     const _edits = new WeakMap()
     const _ver = new WeakMap()
     const _content = new WeakMap()
+    const _shadow = new WeakMap()
     const _DSOperation = new WeakMap()
     const _DSPiplineMng = new WeakMap()
     const _xhr = new WeakMap()
 
     class DSObject {
 
-        /*
-           edits
-           [
-              delta,
-              {
-                 my : 0,
-                 your : 0
-              }
-           ]
-        */
-
-        constructor({url, DSlocation, defaultContent : "" }){
+        constructor({url = "http://localhost:8080/", DSlocation = "client", defaultContent = ""}){
             _url.set(this, url)
-            _ver.set(this,{client : 0 , server : 0})
+            _ver.set(this, {client: 0 , server: 0})
             _edits.set(this, [])
             _content.set(this, defaultContent)
+            _shadow.set(this,"")
             _DSOperation.set(this, new DSOperation())
             _DSPiplineMng.set(this, new DSPipelineManager(DSlocation))
             //only client side
@@ -127,25 +119,25 @@ const DSObject = (()=>{
             return _edits.get(this)
         }
 
-        contentsHasChanged(changedContent){
-            const delta = _DSOperation.get(this).diff(_content.get(this), changedContent)
+        // client contents
+        contentsHasChanged(changedContents){
+            _content.set(this,changedContents)
+            const delta = _DSOperation.get(this).diff(_shadow.get(this), _content.get(this))
             _edits.get(this).push([delta, _ver.get(this)])
-            _ver.get(this).client++;
             return _edits.get(this)
+        }
+
+        copyContentToShadow(){
+            _ver.get(this).client++;
+            _shadow.set(this,_content.get(this))
+        }
+
+        sendEdits(){
         }
 
         receivedEdits(edits){
             if(edits[1].my == _edits.get(this)[1].your){
-
             }
-        }
-
-        run(){
-            //setInterval(,1000)
-        }
-        sendEditsWithVersionNumber(url, edits){
-            // axjs send date [edits, my_ver, your_ver]
-            throw new SyntaxError(`sendEditswithversionnumber is not implemented!`)
         }
     }
     return DSObject
@@ -155,6 +147,26 @@ const DSObject = (()=>{
 const DSObjectClient = (()=>{
     class DSObjectClient {
         constructor(){
+        }
+        // client contents
+        contentsHasChanged(changedContents){
+            _content.set(this,changedContents)
+            const delta = _DSOperation.get(this).diff(_shadow.get(this), _content.get(this))
+            _edits.get(this).push([delta, _ver.get(this)])
+            return _edits.get(this)
+        }
+
+        copyContentToShadow(){
+            _ver.get(this).client++;
+            _shadow.set(this,_content.get(this))
+        }
+
+        sendEdits(){
+        }
+
+        receivedEdits(edits){
+            if(edits[1].my == _edits.get(this)[1].your){
+            }
         }
     }
     return DSObjectClient

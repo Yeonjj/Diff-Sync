@@ -34,7 +34,9 @@ DONE : diff와 patch는 각각 delta값을 반환한다. makeEdits는 delta를 �
 TODO : TextDSConnection Use-case정의하기
 TODO : 각 클래스 uml제작후 각 함수나 클래스 브랜치로 만든뒤 merge
 
+## 2018.12.3 현제 class 구조
 
+![Image of Yaktocat](./DSObject-classes.png)
 
 
 

@@ -1,24 +1,21 @@
 'use strict'
 
-let diff_match_patch
-let dmp
+let DSObject
 let DS
 
 describe('ds-algorithm-test ',() => {
     beforeEach(() => {
-        diff_match_patch = require("../diff-match-patch.js")
-        dmp = new diff_match_patch()
-        DS = require("../ds.js")
+        DSObject = require("../ds.js").DSObject
+        DS = new DSObject("server")
     })
 
     it('creates the DS text object', ()=>{
-        expect(Object.keys(DS)).toEqual(['DPComponent', 'DSConnectionComponent', 'DSObject', 'textComponent'])
-        expect(typeof(DS.textComponent)).toBe("object")
-        expect(typeof(diff_match_patch)).toBe("function")
-        expect(typeof(dmp)).toBe("object")
+        expect(DS.constructor.name).toBe("DSObject")
+        expect(DSObject.name).toBe("DSObject")
     })
     it('diffs and patchs two different contents and make result as a string', ()=>{
-        DS.textComponent.diff("cat","cats")
-        expect(DS.textComponent.patch("Cat")).toBe("Cats")
+        DS.contentsHasChanged("cat")
+        expect(DS.edits.constructor.name).toBe("Array")
+        console.log(`${DS.edits}, ${DS.edits[1]}`)
     })
 })

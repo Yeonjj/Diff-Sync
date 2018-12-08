@@ -21,15 +21,15 @@ class DSTextOperation{
 }
 
 abstract class DSLoop{
--piplineMng : DSPiplineManager
--DSfactory : Factory
 -url : string
+-contents : string
 -shadow : string
--ver : array
--edits : array
--operation : DSOperation
+-myVer : number
+-yourVer : number
+-edits : Map
+-dsOperation : DSOperation
 -deleteEdits(versionNumber)
-#contentHasChanged(content)
+#makeEdits(content)
 #receivedEdits(responseEdits)
 --abstract--
 {abstract}+runLoop()

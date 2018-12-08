@@ -2,9 +2,10 @@
 
 ## class oaverview
 
-x - 2018.12.3 현제 class 구조
+![Image of Yaktocat](./img/DSObject-classes.png)
 
-![Image of Yaktocat](./DSObject-classes.png)
+# API
 
+## set diff and patch 
 
-
+## set server and client

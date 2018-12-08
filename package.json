@@ -1,16 +1,14 @@
 {
     "name": "diff-sync-project",
     "version": "1.0.0",
-    "description": "DS based server client editor",
-    "main": "app.js",
+    "description": "DS based server client loop",
     "scripts": {
         "jest": "jest"
     },
     "author": "",
     "license": "ISC",
     "dependencies": {
-        "express": "^4.16.4",
-        "vue": "^2.5.17"
+        "express": "^4.16.4"
     },
     "devDependencies": {
         "jest": "^23.6.0"

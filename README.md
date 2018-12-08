@@ -5,7 +5,7 @@
  
   ## test Diff-Sync loop 
  
- you can test DS loop with next commend on terminal
+ you can test DS loop with next commend on terminal:
  
  ```
  ❯ npm run jest ds-client-server-loop-test

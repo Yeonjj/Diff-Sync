@@ -1,13 +1,13 @@
 'use strict'
 const __dev__ = true
 
-
+// every constructor should have roro pattern param, so that facntory can send args
 /*
    setOperation() should always have to be called after the available Types are set.
    After DSObject are created, you can add a diff-patch operation for a new type of content
    by addNewoperation() method.
    setOperation() sets which type of content operation you are going to use.
-*/
+ */
 const DSOperation = (()=>{
 
     const _diff = new WeakMap()
@@ -24,7 +24,7 @@ const DSOperation = (()=>{
         }
 
         addNewOperation(newOperation, newType){
-            if(typeof(newTypes)==!"sring")
+            if(typeof newTypes ==! "sring")
                 throw SyntaxError(`newTypes are should be string name of name`)
             _availableTypeOperations.get(this).set(newType, newOperation)
             this.setOperation(newType)
@@ -88,110 +88,195 @@ const DSTextOperation = function() {
 }
 
 /*
- * @param {DSlocation} A location the DSobject are at
- */
-const DSObject = (()=>{
-    const _url = new WeakMap()
-    const _edits = new WeakMap()
-    const _ver = new WeakMap()
-    const _content = new WeakMap()
-    const _shadow = new WeakMap()
-    const _DSOperation = new WeakMap()
-    const _DSPiplineMng = new WeakMap()
-    const _xhr = new WeakMap()
 
-    class DSObject {
+ */
+const DSLoop = (()=>{
+    class DSLoop {
 
         constructor({url = "http://localhost:8080/", DSlocation = "client", defaultContent = ""}){
-            _url.set(this, url)
-            _ver.set(this, {client: 0 , server: 0})
-            _edits.set(this, [])
-            _content.set(this, defaultContent)
-            _shadow.set(this,"")
-            _DSOperation.set(this, new DSOperation())
-            _DSPiplineMng.set(this, new DSPipelineManager(DSlocation))
+            this._url = url
+            this._myVer = 0
+            this._yourVer = 0
+            this._edits = new Map()
+            this._content = defaultContent
+            this._shadow = ""
+            this._backup = ""
+            this._dsOperation = new DSOperation()
             //only client side
-            //_xhr.set(this, new XMLHttpRequest())
+
         }
 
-        // there is no need this method to be public.
-        get edits(){
-            return _edits.get(this)
+        runLoop(){
+            throw new SyntaxError(`runLoop is not implemented`)
         }
 
-        // client contents
-        contentsHasChanged(changedContents){
-            _content.set(this,changedContents)
-            const delta = _DSOperation.get(this).diff(_shadow.get(this), _content.get(this))
-            _edits.get(this).push([delta, _ver.get(this)])
-            return _edits.get(this)
-        }
+        _contentHasChanged(content){
+            this._content = content
 
-        copyContentToShadow(){
-            _ver.get(this).client++;
-            _shadow.set(this,_content.get(this))
-        }
-
-        sendEdits(){
-        }
-
-        receivedEdits(edits){
-            if(edits[1].my == _edits.get(this)[1].your){
+            if(this._edits.get("yourVer") == undefined){
+                this._edits.set("yourVer",this._yourVer)
             }
+
+            // 1a, 1b
+            const delta = this._dsOperation.diff(this._shadow, this._content)
+
+            if (delta.length =! 0){
+                // 2
+                this._edits.set(this._myVer, delta)
+            }
+            else {
+                //nothing has changed
+            }
+
+            // 3
+            this._shadow = this._content
+            this._myVer++;
+
+            return this._edits
+        }
+
+        // 질문!! javascript에서는 connection timeout 이 발 생했을 때 어떻게 하는가.
+        // when ajax call has succecfully return
+        // TODO: 계산된 프로퍼티 이름 computed property names로 바꾸기
+        _receivedEdits(responceEdits){
+            if(responceEdits.get("yourVer") == this._myVer){
+                this._deleteEdits(responceEdits.get("yourVer"))
+                for(let responceEdit of responceEdits){
+                    if(responceEdit[0] >= this._yourVer){
+                        this._shadow = this._dsOperation.patch(this._shadow, responceEdit[1])
+                        this._yourVer++;
+                        this._backup = this._shadow
+                        this._backupVer = this._myVer
+                        // we do this because before this function starts this._content might have been changed
+                        this._content = this._dsOperation.patch(this._content, responceEdit[1])
+                    }
+                }
+            }
+            else{
+                //previuse sending was faild
+                //backup rutine
+                this._edits = []
+                this._shadow = this._backup
+                this._myVer = this._backupVer
+                this._receivedEdits(responceEdits)
+            }
+        }
+
+        _deleteEdits(ver){
+            for (let edit of this._edits){
+                if(edit[0] < ver)
+                    this._edits.delete(edit[0])
+            }
+        }
+    }
+    return DSLoop
+})()
+
+const DSLoopClient = (()=>{
+    const _xhr = new WeakMap()
+
+    class DSLoopClient extends DSLoop{
+        constructor(args){
+            super(args)
+            _xhr.set(this, new XMLHttpRequest())
+        }
+        runLoop(){
+        }
+    }
+    return DSLoopClient
+})()
+
+
+// server ds
+const DSLoopServer = (()=>{
+    class DSLoopServer extends DSLoop{
+        constructor(args){
+            super(args)
+        }
+    }
+    return DSLoopServer
+})()
+
+// pipeline structure, DSLoop is  middleware
+const Pipeline = (()=>{
+//    const _locationFactroy = new WeakMap()
+    const _pipes = new WeakMap()
+
+//    const addLocation = ()=>{
+//        const locationFactory = _pipefactroy.get(this)
+//        locationFactory.addProductSchema(DSLoopClient)
+//        locationFactory.addProductSchema(DSLoopServer)
+//    }
+
+    class Pipeline {
+        constructor(){
+//            _localFactroy.set(this, new Factory())
+//            _actionPipe.set(this, new Factory())
+//            addLocation()
+
+            _pipes.set(this, new Array())
+        }
+        addNextPipe(action, args){
+            const pipes = _pipes.get(this)
+            pipes.push([action, args])
+        }
+        runPipeline(){
+            const pipes = _pipes.get(this)
+            for(let key in pipes){
+                if(pipes[key].constructor.name == "Array")
+                    pipes[key]()
+                pipes[key]
+            }
+        }
+    }
+    return Pipeline
+})()
+
+
+const Factory = (()=>{
+    const _objects = new WeakMap()
+
+    class Factory {
+        constructor(){
+            _objects.set(this, new Map())
+        }
+        addProductSchema(product){
+            if(typeof product == "object")
+                _objects.get(this).set(product.constructor.name, product)
+            if(typeof product == "function")
+                _objects.get(this).set(product.prototype.constructor.name, product)
+        }
+        produce(productName, args = {}){
+            return new (_objects.get(this).get(productName))(args)
+        }
+    }
+    return Factory
+})()
+
+const DSObject = (()=>{
+    const _dsLocationfactory = new WeakMap()
+
+
+    class DSObject {
+        constructor(){
+            _dsLocationfactory.set(this, new Factory())
+            _dsLocationfactory.get(this).set("client", new DSLoopClient())
+            _dsLocationfactory.get(this).set("server", new DSLoopServer())
+        }
+
+        setDS(location, url){
+
+        }
+
+        run(){
+            DSLocation.runLoop()
         }
     }
     return DSObject
 })()
 
-// client ds
-const DSObjectClient = (()=>{
-    class DSObjectClient {
-        constructor(){
-        }
-        // client contents
-        contentsHasChanged(changedContents){
-            _content.set(this,changedContents)
-            const delta = _DSOperation.get(this).diff(_shadow.get(this), _content.get(this))
-            _edits.get(this).push([delta, _ver.get(this)])
-            return _edits.get(this)
-        }
-
-        copyContentToShadow(){
-            _ver.get(this).client++;
-            _shadow.set(this,_content.get(this))
-        }
-
-        sendEdits(){
-        }
-
-        receivedEdits(edits){
-            if(edits[1].my == _edits.get(this)[1].your){
-            }
-        }
-    }
-    return DSObjectClient
-})()
-
-// server ds
-const DSObjectServer = (()=>{
-
-    class DSObjectServer {
-        constructor(){
-        }
-    }
-    return DSObjectServer
-})()
-
-// pipeline structure, DSObject is  middleware
-const DSPipelineManager = (()=>{
-    class DSPipelineManager {
-    }
-
-    return DSPipelineManager
-})()
-
 module.exports = {
-    DSObject,
+    DSLoop,
     DSOperation
 }
 

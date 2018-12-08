@@ -1,46 +1,52 @@
 @startuml
 skinparam classAttributeIconSize 0
 
+
 abstract class DSOperation {
-+addNewOperationWithType(newOperation, newType)
-{abstract}+diff(oldContent, newContent)
-{abstract}+patch(oldContent, edits)
+-diff : function
+-patch : function
+-availableTypeOperation : string
+__
++addNewOperation(newOperation, newType) 
++setOperation(contentType)
+--abstract--
+{abstract}+diff(oldContent, newContent) : array
+{abstract}+patch(oldContent, edits): string
 }
 
 class DSTextOperation{
-+diff(oldContent, newContent)
-+patch(oldContent, edits)
+-dmp : diff_match_patch
++diff(oldContent, newContent) : array
++patch(oldContent, edits) : string
 }
 
-
-
-class PiplineManager {
--pipline
-+addNextPipe()
-+run()
+abstract class DSLoop{
+-piplineMng : DSPiplineManager
+-DSfactory : Factory
+-url : string
+-shadow : string
+-ver : array
+-edits : array
+-operation : DSOperation
+-deleteEdits(versionNumber)
+#contentHasChanged(content)
+#receivedEdits(responseEdits)
+--abstract--
+{abstract}+runLoop()
 }
 
-class DSObject {
--piplineMng
--operation
--shadow
--edits
--myVer
--yourVer
+class DSLoopClient {
++runLoop()
 }
 
-class DSObjectClient {
-
+class DSLoopServer {
++runLoop()
 }
 
-class DSObjectServer {
+DSLoop *--> DSOperation
+DSLoopClient --|> DSLoop
+DSLoopServer --|> DSLoop
 
-}
-
-DSObject -> PiplineManager
-DSObject *--> DSOperation 
-DSObjectClient --|> DSObject
-DSObjectServer --|> DSObject
-DSOperation <|..  DSTextOperation
+DSOperation *-->  DSTextOperation
 
 @enduml

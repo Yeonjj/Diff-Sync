@@ -1,11 +1,12 @@
 'use strict'
 
+import {DSLoop} from '../ds.js'
 let test_client
 let test_server
 
 describe('ds-client-server-loop-test ',() => {
     beforeEach(() => {
-        test_client = new (require("../ds.js"))({})
+        test_client = new DSLoop({})
     })
 
     it('creates client DS object', ()=>{
@@ -26,7 +27,7 @@ describe('ds-client-server-loop-test ',() => {
 
         describe('after it receive responce', ()=>{
             beforeEach(()=>{
-                test_server = new (require("../ds.js"))({})
+                test_server = new DSLoop({})
             })
             it('dose nothing if client-side was not changed', ()=>{
                 test_client._makeEdits()

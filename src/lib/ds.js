@@ -1,5 +1,5 @@
 'use strict'
-const diff_match_patch = require('../../util/diff-match-patch.js')
+import {diff_match_patch} from '../../util/diff-match-patch.js'
 const __dev__ = true
 
 /*
@@ -8,7 +8,7 @@ const __dev__ = true
    by addNewoperation() method.
    setOperation() sets which type of content operation you are going to use.
  */
-const DSOperation = (()=>{
+export const DSOperation = (()=>{
 
     const _diff = new WeakMap()
     const _patch = new WeakMap()
@@ -89,7 +89,7 @@ const DSTextOperation = function() {
 /*
 
  */
-const DSLoop = (()=>{
+export const DSLoop = (()=>{
     class DSLoop {
 
         constructor({url = "http://localhost:8080/", DSlocation = "client", defaultContent = ""}){
@@ -160,4 +160,3 @@ const DSLoop = (()=>{
     return DSLoop
 })()
 
-module.exports = DSLoop

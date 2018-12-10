@@ -1,5 +1,5 @@
 'use strict'
-import {diff_match_patch} from '../../util/diff-match-patch.js'
+import {diff_match_patch} from '../util/diff-match-patch.js'
 const __dev__ = true
 
 /*

@@ -8,6 +8,6 @@
  you can test DS loop with next commend on terminal:
  
  ```
- ❯ npm run jest ds-client-server-loop-test
+ ❯ npm run test ds-client-server-loop-test
  ```
  

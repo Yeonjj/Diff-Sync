@@ -90,17 +90,26 @@ const DSTextOperation = function() {
 
  */
 export const DSLoop = (()=>{
-    class DSLoop {
 
+    const _url = new WeakMap()
+    const _myVer = new WeakMap()
+    const _yourVer = new WeakMap()
+    const _edits = new WeakMap()
+    const _content = new WeakMap()
+    const _shadow = new WeakMap()
+    const _backup = new WeakMap()
+    const _dsOperation = new WeakMap() 
+
+    class DSLoop {
         constructor({url = "http://localhost:8080/", DSlocation = "client", defaultContent = ""}){
-            this._url = url
-            this._myVer = 0
-            this._yourVer = 0
-            this._edits = new Map()
-            this._content = defaultContent
-            this._shadow = ""
-            this._backup = ""
-            this._dsOperation = new DSOperation()
+            _url.set(this, url)
+            _myVer.set(this, 0)
+            _yourVer.set(this, 0)
+            _edits.set(this, new Map())
+            _content.set(this, defaultContent)
+            _shadow.set(this, "")
+            _backup.set(this, "")
+            _dsOperation.set(this, new DSOperation())
         }
 
         runLoop(){
@@ -109,51 +118,51 @@ export const DSLoop = (()=>{
 
         _makeEdits(content){
             if(content){
-                this._content = content
+                _content.set(this, content)
             }
-            this._edits.set("yourVer",this._yourVer)
+            _edits.get(this).set("yourVer",_yourVer.get(this))
 
-            const delta = this._dsOperation.diff(this._shadow, this._content)
+            const delta = _dsOperation.get(this).diff(_shadow.get(this), _content.get(this))
 
             if (delta.length ==! 0){
-                this._edits.set(this._myVer, delta)
-                this._shadow = this._content
-                this._myVer++
+                _edits.get(this).set(_myVer.get(this), delta)
+                _shadow.set(this, _content.get(this))
+                _myVer.set(this, _myVer.get(this) + 1)
             }
             else {
 
             }
 
-            return this._edits
+            return _edits.get(this)
         }
 
         // TODO: 계산된 프로퍼티 이름 computed property names로 바꾸기
         _receivedEdits(responceEdits){
-            if(responceEdits.get("yourVer") == this._myVer){
+            if(responceEdits.get("yourVer") == _myVer.get(this)){
                 this._deleteEdits(responceEdits.get("yourVer"))
                 for(let responceEdit of responceEdits){
-                    if(responceEdit[0] >= this._yourVer){
-                        this._shadow = this._dsOperation.patch(this._shadow, responceEdit[1])
-                        this._yourVer++;
-                        this._backup = this._shadow
-                        this._backupVer = this._myVer
+                    if(responceEdit[0] >= _yourVer.get(this){
+                        _shadow.set(this, _dsOperation.get(this).patch(_shadow.get(this), responceEdit[1]))
+                        _yourVer.set(this, _yourVer.get(this) + 1)
+                        _backup.get(this), _shadow.get(this)
+                        _backupVer.set(this, _myVer.get(this))
                         // we do this because before this function starts this._content might have been changed
-                        this._content = this._dsOperation.patch(this._content, responceEdit[1])
+                        _content.set(this, _dsOperation.get(this).patch(_content.get(this), responceEdit[1])
                     }
                 }
             }
             else{
-                this._edits = new Map()
-                this._shadow = this._backup
-                this._myVer = this._backupVer
+                _edits.set(this, new Map())
+                _shadow.set(this, _backup.get(this))
+                _myVer.set(this, _backupVer.get(this))
                 this._receivedEdits(responceEdits)
             }
         }
 
         _deleteEdits(ver){
-            for (let edit of this._edits){
+            for (let edit of _edits.get(this)){
                 if(edit[0] < ver)
-                    this._edits.delete(edit[0])
+                    _edits.get(this).delete(edit[0])
             }
         }
     }

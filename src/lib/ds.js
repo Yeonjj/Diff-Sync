@@ -1,5 +1,5 @@
 'use strict'
-const diff_match_patch = require('../../util/diff-match-patch.js')
+import diff_match_patch from '../util/diff-match-patch'
 const __dev__ = true
 
 /*
@@ -89,9 +89,9 @@ const DSTextOperation = function() {
 /*
 
  */
-const DSLoop = (()=>{
+export const DSLoop = (()=>{
+    // TODO: destroy 함수 구현
     class DSLoop {
-
         constructor({url = "http://localhost:8080/", DSlocation = "client", defaultContent = ""}){
             this._url = url
             this._myVer = 0
@@ -159,5 +159,3 @@ const DSLoop = (()=>{
     }
     return DSLoop
 })()
-
-module.exports = DSLoop

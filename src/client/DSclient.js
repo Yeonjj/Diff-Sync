@@ -1,5 +1,5 @@
-const DSLoop = require('../lib/ds.js')
-const DSLoopClient = (()=>{
+import {DSLoop} from '../lib/ds'
+export const DSLoopClient = (()=>{
     const _xhr = new WeakMap()
 
     class DSLoopClient extends DSLoop{
@@ -12,5 +12,3 @@ const DSLoopClient = (()=>{
     }
     return DSLoopClient
 })()
-
-module.exports = DSLoopClient

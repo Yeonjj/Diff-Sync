@@ -2227,12 +2227,4 @@ diff_match_patch.patch_obj.prototype.toString = function() {
 // Users of node.js should 'require' the uncompressed version since Google's
 // JS compiler may break the following exports for non-browser environments.
 /** @suppress {globalThis} */
-this['diff_match_patch'] = diff_match_patch;
-/** @suppress {globalThis} */
-this['DIFF_DELETE'] = DIFF_DELETE;
-/** @suppress {globalThis} */
-this['DIFF_INSERT'] = DIFF_INSERT;
-/** @suppress {globalThis} */
-this['DIFF_EQUAL'] = DIFF_EQUAL;
-
-module.exports = diff_match_patch
+export default diff_match_patch

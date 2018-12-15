@@ -3,7 +3,9 @@
     "version": "1.0.0",
     "description": "DS based server client loop",
     "scripts": {
-        "jest": "jest"
+        "test": "jest",
+        "start": "node bin/dev",
+        "build": "rm -rf build && babel src -s -d build"
     },
     "author": "",
     "license": "ISC",
@@ -11,6 +13,9 @@
         "express": "^4.16.4"
     },
     "devDependencies": {
+        "babel-cli": "^6.26.0",
+        "babel-preset-env": "^1.7.0",
+        "babel-register": "^6.26.0",
         "jest": "^23.6.0"
     }
 }

@@ -20,3 +20,5 @@ This project is written in ES6. To build project into ES5 you can:
 ```
 
 It will create build folder and compile all code in src.
+
+TODO: add babel ignore into babelrc. now there is a problem to add this.
